@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import HeaderNav from "@/components/navigation/HeaderNav";
-import FooterNav from "@/components/navigation/FooterNav";
+import HeaderNav from "@/components/navigation/HeaderNav.vue";
+import FooterNav from "@/components/navigation/FooterNav.vue";
 </script>
 
 <template>

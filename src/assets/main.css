@@ -1,4 +1,13 @@
+@import "tailwindcss";
 @import "./base.css";
+
+@theme {
+  --color-brand-darkest-blue: var(--phthalo-blue);
+  --color-brand-darker-blue: var(--egyptian-blue);
+  --color-brand-blue: var(--air-superiority-blue);
+  --color-brand-darker-green: var(--celadon);
+  --color-brand-green: var(--tea-green);
+}
 
 #app {
   width: 100%;
@@ -6,22 +15,53 @@
   position: relative;
 }
 
-a,
-.green {
-  text-decoration: none;
-  color: hsla(160, 100%, 37%, 1);
-  transition: 0.4s;
-  padding: 3px;
+/* Custom transitions */
+.custom-transition-default {
+  transition: all 0.3s ease-in-out;
 }
 
-@media (hover: hover) {
-  a:hover {
-    background-color: hsla(160, 100%, 37%, 0.2);
+.custom-transition-fast {
+  transition: all 0.2s ease-in-out;
+}
+
+.custom-transition-slow {
+  transition: all 0.5s ease-in-out;
+}
+
+/* Arrow icon animations */
+@keyframes bobbing-left-right {
+  from {
+    transform: translateX(0px);
+  }
+  to {
+    transform: translateX(4px);
   }
 }
 
-@media (min-width: 1024px) {
-  body {
-    display: flex;
+.custom-btn:focus > .right-to-down-arrow {
+  transform: rotate(90deg);
+}
+
+.custom-btn:focus > .right-bobbing-arrow {
+  animation: 0.4s infinite alternate ease-in-out bobbing-left-right;
+}
+
+.custom-btn:focus > .external-link-arrow,
+.custom-link:focus > .external-link-arrow {
+  transform: translate(4px, -4px);
+}
+
+@media (hover: hover) {
+  .custom-btn:hover > .right-to-down-arrow {
+    transform: rotate(90deg);
+  }
+
+  .custom-btn:hover > .right-bobbing-arrow {
+    animation: 0.4s infinite alternate ease-in-out bobbing-left-right;
+  }
+
+  .custom-btn:hover > .external-link-arrow,
+  .custom-link:hover > .external-link-arrow {
+    transform: translate(4px, -4px);
   }
 }

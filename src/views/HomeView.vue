@@ -1,7 +1,15 @@
 <script setup lang="ts">
+import { ref } from "vue";
+import { Icon } from "@iconify/vue";
+
 import DefaultLayout from "@/layouts/DefaultLayout.vue";
 import CustomButton from "@/components/inputs/CustomButton.vue";
-import { Icon } from "@iconify/vue";
+
+const name = ref("Vue.js");
+
+function greet() {
+  alert(`Hello ${name.value}!`);
+}
 </script>
 
 <template>
@@ -13,11 +21,11 @@ import { Icon } from "@iconify/vue";
         <div class="main-btn-container">
           <CustomButton>
             Find a template
-            <Icon icon="ion:arrow-forward" />
+            <Icon icon="ion:arrow-forward" class="right-to-down-arrow custom-transition-default" />
           </CustomButton>
-          <CustomButton onclick="console.log('hello')">
+          <CustomButton variant="outline" :onClick="greet">
             Start from scratch
-            <Icon icon="ion:arrow-forward" />
+            <Icon icon="ion:arrow-forward" class="right-bobbing-arrow custom-transition-default" />
           </CustomButton>
         </div>
       </div>
@@ -58,7 +66,7 @@ main {
   flex-direction: row;
   align-items: center;
   justify-content: center;
-  gap: 0.25rem;
+  gap: 0.5rem;
   margin-top: 0.5rem;
 }
 </style>

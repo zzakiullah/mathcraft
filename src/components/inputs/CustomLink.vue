@@ -8,10 +8,15 @@ defineProps<{
 </script>
 
 <template>
-  <a v-if="isExternal" class="custom-link" :href="href" :target="isExternal ? '_blank' : '_self'">
+  <a
+    v-if="isExternal"
+    class="custom-link custom-transition-default"
+    :href="href"
+    :target="isExternal ? '_blank' : '_self'"
+  >
     <slot></slot>
   </a>
-  <RouterLink v-else class="custom-link" :to="href">
+  <RouterLink v-else class="custom-link custom-transition-default" :to="href">
     <slot></slot>
   </RouterLink>
 </template>

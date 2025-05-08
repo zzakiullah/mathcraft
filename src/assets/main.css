@@ -1,14 +1,6 @@
 @import "tailwindcss";
 @import "./base.css";
 
-@theme {
-  --color-brand-darkest-blue: var(--phthalo-blue);
-  --color-brand-darker-blue: var(--egyptian-blue);
-  --color-brand-blue: var(--air-superiority-blue);
-  --color-brand-darker-green: var(--celadon);
-  --color-brand-green: var(--tea-green);
-}
-
 #app {
   width: 100%;
   font-weight: normal;

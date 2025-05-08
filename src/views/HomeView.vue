@@ -1,15 +1,8 @@
 <script setup lang="ts">
-import { ref } from "vue";
 import { Icon } from "@iconify/vue";
 
 import DefaultLayout from "@/layouts/DefaultLayout.vue";
 import CustomButton from "@/components/inputs/CustomButton.vue";
-
-const name = ref("Vue.js");
-
-function greet() {
-  alert(`Hello ${name.value}!`);
-}
 </script>
 
 <template>
@@ -19,11 +12,17 @@ function greet() {
         <h1 class="main-heading">Mathcraft</h1>
         <p class="main-subheading">An interactive math sandbox</p>
         <div class="main-btn-container">
-          <CustomButton>
+          <CustomButton
+            styles="bg-blue-800 border-blue-800 text-white hover:bg-blue-700 hover:border-blue-700"
+          >
             Find a template
             <Icon icon="ion:arrow-forward" class="right-to-down-arrow custom-transition-default" />
           </CustomButton>
-          <CustomButton variant="outline" :onClick="greet">
+          <CustomButton
+            styles="bg-transparent border-blue-800 text-blue-800 hover:bg-blue-100"
+            href="/sandbox"
+            ariaLabel="Start interactive sandbox"
+          >
             Start from scratch
             <Icon icon="ion:arrow-forward" class="right-bobbing-arrow custom-transition-default" />
           </CustomButton>

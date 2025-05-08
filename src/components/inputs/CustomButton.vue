@@ -1,42 +1,19 @@
 <script setup lang="ts">
-import { ref } from "vue";
 import { RouterLink } from "vue-router";
 
-const { theme = "primary", variant = "contained" } = defineProps<{
-  theme?: "primary" | "secondary" | "tertiary" | "quaternary" | "quinary";
-  variant?: "contained" | "outlined";
-  size?: "xs" | "sm" | "md" | "lg" | "xl";
+defineProps<{
+  styles?: string;
   href?: string;
   isExternal?: boolean;
   ariaLabel?: string;
   onClick?: () => void;
 }>();
-
-const brandColors = {
-  primary: "brand-darkest-blue",
-  secondary: "brand-darker-blue",
-  tertiary: "brand-blue",
-  quaternary: "brand-darkest-green",
-  quinary: "brand-green",
-};
-
-const neutralColors = {
-  primary: "white",
-  secondary: "white",
-  tertiary: "white",
-  quaternary: "neutral-800",
-  quinary: "neutral-800",
-};
-
-const bgColor = ref<string>(variant === "contained" ? brandColors[theme] : "transparent");
-const textColor = ref<string>(variant === "contained" ? neutralColors[theme] : brandColors[theme]);
-const border = ref<string>(brandColors[theme]);
 </script>
 
 <template>
   <RouterLink
     v-if="href && !isExternal"
-    :class="`custom-btn custom-transition-default border-2 rounded-full bg-${bgColor} text-${textColor} border-${border}`"
+    :class="`custom-btn custom-transition-default border-2 rounded-full ${styles}`"
     :to="href"
     :aria-label="ariaLabel"
   >
@@ -44,7 +21,7 @@ const border = ref<string>(brandColors[theme]);
   </RouterLink>
   <a
     v-else-if="href"
-    :class="`custom-btn custom-transition-default border-2 rounded-full bg-${bgColor} text-${textColor} border-${border}`"
+    :class="`custom-btn custom-transition-default border-2 rounded-full ${styles}`"
     :href="href"
     :target="isExternal ? '_blank' : '_self'"
     :aria-label="ariaLabel"
@@ -53,7 +30,7 @@ const border = ref<string>(brandColors[theme]);
   </a>
   <button
     v-else
-    :class="`custom-btn custom-transition-default border-2 rounded-full bg-${bgColor} text-${textColor} border-${border}`"
+    :class="`custom-btn custom-transition-default border-2 rounded-full ${styles}`"
     :aria-label="ariaLabel"
     @click="onClick"
   >

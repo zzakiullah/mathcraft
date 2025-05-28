@@ -2,21 +2,29 @@
 import { RouterLink } from "vue-router";
 
 defineProps<{
+  styles?: string;
   href: string;
   isExternal?: boolean;
+  ariaLabel?: string;
 }>();
 </script>
 
 <template>
   <a
     v-if="isExternal"
-    class="custom-link custom-transition-default"
+    :class="`custom-link custom-transition-default ${styles}`"
     :href="href"
     :target="isExternal ? '_blank' : '_self'"
+    :aria-label="ariaLabel"
   >
     <slot></slot>
   </a>
-  <RouterLink v-else class="custom-link custom-transition-default" :to="href">
+  <RouterLink
+    v-else
+    :class="`custom-link custom-transition-default ${styles}`"
+    :to="href"
+    :aria-label="ariaLabel"
+  >
     <slot></slot>
   </RouterLink>
 </template>

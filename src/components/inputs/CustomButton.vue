@@ -45,7 +45,6 @@ defineProps<{
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
-  padding: 0.75rem 1rem;
   cursor: pointer;
 }
 </style>

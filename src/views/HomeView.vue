@@ -13,13 +13,14 @@ import CustomButton from "@/components/inputs/CustomButton.vue";
         <p class="main-subheading">An interactive math sandbox</p>
         <div class="main-btn-container">
           <CustomButton
-            styles="bg-blue-800 border-blue-800 text-white hover:bg-blue-700 hover:border-blue-700"
+            styles="bg-blue-800 border-blue-800 text-white px-4 py-3 hover:bg-blue-700 hover:border-blue-700"
+            ariaLabel="Scroll down to browse templates"
           >
             Find a template
             <Icon icon="ion:arrow-forward" class="right-to-down-arrow custom-transition-default" />
           </CustomButton>
           <CustomButton
-            styles="bg-transparent border-blue-800 text-blue-800 hover:bg-blue-100"
+            styles="bg-transparent border-blue-800 text-blue-800 px-4 py-3 hover:bg-blue-100"
             href="/sandbox"
             ariaLabel="Start interactive sandbox"
           >

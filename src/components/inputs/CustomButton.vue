@@ -1,11 +1,12 @@
 <script setup lang="ts">
 import { RouterLink } from "vue-router";
 
-defineProps<{
+const { type = "button" } = defineProps<{
   styles?: string;
   href?: string;
   isExternal?: boolean;
   ariaLabel?: string;
+  type?: "button" | "submit" | "reset";
   onClick?: () => void;
 }>();
 </script>
@@ -32,6 +33,7 @@ defineProps<{
     v-else
     :class="`custom-btn custom-transition-default ${styles}`"
     :aria-label="ariaLabel"
+    :type="type"
     @click="onClick"
   >
     <slot></slot>

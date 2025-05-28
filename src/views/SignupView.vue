@@ -5,6 +5,17 @@ import AuthLayout from "@/layouts/AuthLayout.vue";
 import CustomButton from "@/components/inputs/CustomButton.vue";
 import CustomLink from "@/components/inputs/CustomLink.vue";
 import IconGoogle from "@/components/icons/IconGoogle.vue";
+import { signUpWithEmail } from "@/lib/db/auth";
+
+async function onSubmit() {
+  const email = "";
+  const password = "";
+  const username = "";
+  const { data, error } = await signUpWithEmail(email, password, username);
+
+  if (error) {
+  }
+}
 </script>
 
 <template>
@@ -20,44 +31,54 @@ import IconGoogle from "@/components/icons/IconGoogle.vue";
         Create, save, and publish custom math lessons for free
       </p>
     </div>
-    <div class="w-full flex flex-col gap-1">
-      <label class="text-sm text-black" for="username">
-        Username <span class="text-red-600">*</span></label
-      >
-      <input
-        id="username"
-        class="text-sm text-black border border-neutral-300 rounded-lg px-4 py-2 placeholder:text-neutral-300"
-        type="text"
-        placeholder="Enter your username"
-      />
-    </div>
-    <div class="w-full flex flex-col gap-1">
-      <label class="text-sm text-black" for="email">
-        Email <span class="text-red-600">*</span></label
-      >
-      <input
-        id="email"
-        class="text-sm text-black border border-neutral-300 rounded-lg px-4 py-2 placeholder:text-neutral-300"
-        type="email"
-        placeholder="Enter your email"
-      />
-    </div>
-    <div class="w-full flex flex-col gap-1">
-      <label class="text-sm text-black" for="password">
-        Password <span class="text-red-600">*</span>
-      </label>
-      <input
-        id="password"
-        class="text-sm text-black border border-neutral-300 rounded-lg px-4 py-2 placeholder:text-neutral-300"
-        type="password"
-        placeholder="Enter your password"
-      />
-    </div>
-    <CustomButton
-      styles="w-full bg-black text-white text-sm px-5 py-2 rounded-lg hover:bg-neutral-700"
-      >Create Account</CustomButton
+    <form
+      class="w-full flex flex-col items-center justify-center gap-3 mt-2"
+      @onsubmit="async () => await onSubmit()"
     >
-    <div class="w-full flex flex-row items-center justify-center gap-2 text-neutral-300 text-sm">
+      <div class="w-full flex flex-col gap-1">
+        <label class="text-sm text-black" for="username">
+          Username <span class="text-red-600">*</span>
+        </label>
+        <input
+          id="username"
+          class="text-sm text-black border border-neutral-300 rounded-lg px-4 py-2 placeholder:text-neutral-300"
+          type="text"
+          placeholder="themathcrafter"
+          required
+        />
+      </div>
+      <div class="w-full flex flex-col gap-1">
+        <label class="text-sm text-black" for="email">
+          Email <span class="text-red-600">*</span>
+        </label>
+        <input
+          id="email"
+          class="text-sm text-black border border-neutral-300 rounded-lg px-4 py-2 placeholder:text-neutral-300"
+          type="email"
+          placeholder="themathcrafter@example.com"
+          required
+        />
+      </div>
+      <div class="w-full flex flex-col gap-1">
+        <label class="text-sm text-black" for="password">
+          Password <span class="text-red-600">*</span>
+        </label>
+        <input
+          id="password"
+          class="text-sm text-black border border-neutral-300 rounded-lg px-4 py-2 placeholder:text-neutral-300"
+          type="password"
+          placeholder="••••••••"
+          required
+        />
+      </div>
+      <CustomButton
+        styles="w-full bg-black text-white text-sm px-5 py-2 mt-2 rounded-lg hover:bg-neutral-700"
+        type="submit"
+      >
+        Create Account
+      </CustomButton>
+    </form>
+    <div class="w-full flex flex-row items-center justify-center gap-2 text-neutral-400 text-sm">
       <div class="grow border-t border-neutral-300 h-0"></div>
       or
       <div class="grow border-t border-neutral-300 h-0"></div>

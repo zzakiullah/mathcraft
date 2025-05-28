@@ -11,7 +11,7 @@ import IconGoogle from "@/components/icons/IconGoogle.vue";
   <AuthLayout>
     <div class="w-full flex flex-row items-center justify-start">
       <CustomLink styles="text-sm text-neutral-400 hover:underline" href="/">
-        <Icon icon="ion:arrow-back" /> Back
+        <Icon icon="ion:arrow-back" /> Back to home
       </CustomLink>
     </div>
     <div class="flex flex-col items-center justify-center gap-1">

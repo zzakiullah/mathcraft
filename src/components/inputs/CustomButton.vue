@@ -13,7 +13,7 @@ defineProps<{
 <template>
   <RouterLink
     v-if="href && !isExternal"
-    :class="`custom-btn custom-transition-default border-2 rounded-full ${styles}`"
+    :class="`custom-btn custom-transition-default ${styles}`"
     :to="href"
     :aria-label="ariaLabel"
   >
@@ -21,7 +21,7 @@ defineProps<{
   </RouterLink>
   <a
     v-else-if="href"
-    :class="`custom-btn custom-transition-default border-2 rounded-full ${styles}`"
+    :class="`custom-btn custom-transition-default ${styles}`"
     :href="href"
     :target="isExternal ? '_blank' : '_self'"
     :aria-label="ariaLabel"
@@ -30,7 +30,7 @@ defineProps<{
   </a>
   <button
     v-else
-    :class="`custom-btn custom-transition-default border-2 rounded-full ${styles}`"
+    :class="`custom-btn custom-transition-default ${styles}`"
     :aria-label="ariaLabel"
     @click="onClick"
   >

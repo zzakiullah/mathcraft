@@ -26,7 +26,7 @@ import CustomLink from "@/components/inputs/CustomLink.vue";
           Login
         </CustomLink>
         <CustomButton
-          styles="bg-blue-800 border-blue-800 text-white text-sm px-3.5 py-1.5 hover:bg-blue-700 hover:border-blue-700"
+          styles="border-2 rounded-full bg-blue-800 border-blue-800 text-white text-sm px-3.5 py-1.5 hover:bg-blue-700 hover:border-blue-700"
           href="/signup"
           ariaLabel="Go to sign-up page"
         >

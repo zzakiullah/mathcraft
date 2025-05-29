@@ -8,7 +8,22 @@ import CustomLink from "@/components/inputs/CustomLink.vue";
 <template>
   <header class="fixed top-0 left-0 right-0 h-14 px-24 py-4 border-b border-neutral-200">
     <nav class="w-full h-full flex flex-row items-center justify-between">
-      <a href="/" aria-label="Go to home page"> Mathcraft </a>
+      <ul class="flex flex-row gap-1">
+        <li>
+          <CustomLink styles="font-semibold px-2" href="/" ariaLabel="Go to homepage">
+            Mathcraft
+          </CustomLink>
+        </li>
+        <li>
+          <CustomLink
+            styles="text-neutral-500 px-2 hover:text-neutral-700"
+            href="/about"
+            ariaLabel="Go to about page"
+          >
+            About
+          </CustomLink>
+        </li>
+      </ul>
       <div class="flex flex-row items-center gap-2">
         <a
           href="https://github.com/zzakiullah/mathcraft"

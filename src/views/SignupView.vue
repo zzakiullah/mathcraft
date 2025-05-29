@@ -64,7 +64,7 @@ async function onSubmit() {
       </CustomLink>
     </div>
     <div class="flex flex-col items-center justify-center gap-1">
-      <h1 class="heading text-3xl text-black text-center">Sign up</h1>
+      <h1 class="font-bold text-3xl text-black text-center">Sign up</h1>
       <p class="text-sm text-neutral-500 text-center">
         Create, save, and publish custom math lessons for free
       </p>
@@ -151,15 +151,7 @@ async function onSubmit() {
     </CustomButton>
     <p class="inline-flex text-neutral-500 text-sm">
       Already have an account?&nbsp;
-      <CustomLink styles="text-black hover:text-neutral-100 hover:underline" href="/login">
-        Login here
-      </CustomLink>
+      <CustomLink styles="text-black hover:underline" href="/login"> Login here </CustomLink>
     </p>
   </AuthLayout>
 </template>
-
-<style scoped>
-.heading {
-  font-weight: 700;
-}
-</style>

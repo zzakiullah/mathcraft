@@ -8,6 +8,10 @@ import CustomLink from "@/components/inputs/CustomLink.vue";
 import IconGoogle from "@/components/icons/IconGoogle.vue";
 import { signUpWithEmail, isUsernameUnique } from "@/lib/db/auth";
 
+const loading = ref(false);
+const errorOccurred = ref(false);
+const sentConfirmationEmail = ref(false);
+
 const username = ref("");
 const email = ref("");
 const password = ref("");
@@ -39,20 +43,26 @@ function validatePassword() {
 }
 
 async function onSubmit() {
+  loading.value = true;
+  errorOccurred.value = false;
+
   if (username.value === "") {
     usernameErrorMsg.value = "Username is required.";
+    loading.value = false;
     return;
   } else {
     usernameErrorMsg.value = "";
   }
   if (email.value === "") {
     emailErrorMsg.value = "Email is required.";
+    loading.value = false;
     return;
   } else {
     emailErrorMsg.value = "";
   }
   if (password.value === "") {
     passwordErrorMsg.value = "Password is required.";
+    loading.value = false;
     return;
   } else {
     passwordErrorMsg.value = "";
@@ -61,14 +71,18 @@ async function onSubmit() {
   const isPasswordValid = validatePassword();
   if (!isPasswordValid) {
     passwordErrorMsg.value = "Password does not meet all requirements.";
+    loading.value = false;
     return;
   }
 
   const isValidUsername = isUsernameUnique(username.value);
   if (isValidUsername === null) {
-    // An error occurred. Try again.
+    errorOccurred.value = true;
+    loading.value = false;
+    return;
   } else if (!isValidUsername) {
-    usernameErrorMsg.value = "This username is taken. Try another.";
+    usernameErrorMsg.value = "That username is taken. Try another.";
+    loading.value = false;
     return;
   }
 
@@ -77,22 +91,22 @@ async function onSubmit() {
     switch (error.code) {
       case "email_address_invalid":
         emailErrorMsg.value = "Please enter a valid email address.";
-        return;
+        break;
       case "email_exists":
         emailErrorMsg.value = "This email is already being used.";
-        return;
+        break;
       case "weak_password":
-        // User is signing up or changing their password without meeting the password strength criteria.
-        // Use the AuthWeakPasswordError class to access more information about what they need to do to make the password pass.
         emailErrorMsg.value = "Password does not meet strength criteria.";
-        return;
+        break;
       default:
-        console.log(error.code, error);
-        return;
+        errorOccurred.value = true;
+        break;
     }
   } else {
     console.log(data.session);
+    sentConfirmationEmail.value = true;
   }
+  loading.value = false;
 }
 </script>
 
@@ -109,7 +123,38 @@ async function onSubmit() {
         Create, save, and publish custom math lessons for free
       </p>
     </div>
+    <div
+      v-if="errorOccurred"
+      class="flex flex-row gap-3 px-5 py-3 bg-red-100 border border-red-400 rounded-lg"
+    >
+      <div class="text-xl">
+        <Icon icon="material-symbols:error-rounded" />
+      </div>
+      <div class="flex flex-col gap-1">
+        <p class="text-black text-sm font-medium">Whoops! Something went wrong</p>
+        <p class="text-neutral-500 text-xs">
+          An unexpected error occurred. Please try again later. Apologies for the inconvenience.
+        </p>
+      </div>
+    </div>
+    <div
+      v-if="sentConfirmationEmail"
+      class="flex flex-row gap-3 px-5 py-3 bg-blue-50 border border-blue-300 rounded-lg"
+    >
+      <div class="text-xl">
+        <Icon icon="material-symbols:mark-email-read-rounded" />
+      </div>
+      <div class="flex flex-col gap-1">
+        <p class="text-black text-sm font-medium">Check your email to confirm</p>
+        <p class="text-neutral-500 text-xs">
+          You&apos;ve successfully signed up. Please check your email at
+          <span class="font-semibold">{{ email }}</span> to confirm your account before signing in
+          to Mathcraft. The confirmation link expires in 10 minutes.
+        </p>
+      </div>
+    </div>
     <form
+      v-else
       class="w-full flex flex-col items-center justify-center gap-3 mt-2"
       @submit.prevent="onSubmit"
     >
@@ -196,9 +241,11 @@ async function onSubmit() {
         </div>
       </div>
       <CustomButton
-        styles="w-full bg-black text-white text-sm px-5 py-2 mt-2 rounded-lg hover:bg-neutral-700"
+        :styles="`w-full bg-black text-white text-sm px-5 py-2 mt-2 rounded-lg hover:bg-neutral-700 ${loading ? 'opacity-50' : 'opacity-100'}`"
         type="submit"
+        :disabled="loading"
       >
+        <Icon v-if="loading" icon="svg-spinners:ring-resize" class="mr-0.5" />
         Create Account
       </CustomButton>
     </form>
@@ -208,7 +255,8 @@ async function onSubmit() {
       <div class="grow border-t border-neutral-300 h-0"></div>
     </div>
     <CustomButton
-      styles="w-full text-black text-sm px-5 py-2 border border-neutral-300 rounded-lg hover:bg-neutral-100 focus:bg-neutral-100"
+      :styles="`w-full text-black text-sm px-5 py-2 border border-neutral-300 rounded-lg hover:bg-neutral-100 focus:bg-neutral-100 ${loading ? 'opacity-50' : 'opacity-100'}`"
+      :disabled="loading"
     >
       <IconGoogle styles="w-auto h-4" /> Continue with Google
     </CustomButton>

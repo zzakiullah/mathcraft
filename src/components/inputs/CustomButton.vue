@@ -7,6 +7,7 @@ const { type = "button" } = defineProps<{
   isExternal?: boolean;
   ariaLabel?: string;
   type?: "button" | "submit" | "reset";
+  disabled?: boolean;
   onClick?: () => void;
 }>();
 </script>
@@ -34,6 +35,7 @@ const { type = "button" } = defineProps<{
     :class="`custom-btn custom-transition-default ${styles}`"
     :aria-label="ariaLabel"
     :type="type"
+    :disabled="disabled"
     @click="onClick"
   >
     <slot></slot>

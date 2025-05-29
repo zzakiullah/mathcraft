@@ -3,3 +3,5 @@
  */
 
 export function createVector(context: CanvasRenderingContext2D) {}
+
+export function updateVector(context: CanvasRenderingContext2D) {}

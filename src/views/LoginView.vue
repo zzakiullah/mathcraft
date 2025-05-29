@@ -10,7 +10,7 @@ import IconGoogle from "@/components/icons/IconGoogle.vue";
 <template>
   <AuthLayout>
     <div class="w-full flex flex-row items-center justify-start">
-      <CustomLink styles="text-sm text-neutral-400 hover:underline" href="/">
+      <CustomLink styles="text-sm text-neutral-300 hover:underline" href="/">
         <Icon icon="ion:arrow-back" /> Back to home
       </CustomLink>
     </div>
@@ -60,7 +60,9 @@ import IconGoogle from "@/components/icons/IconGoogle.vue";
     </CustomButton>
     <p class="inline-flex text-neutral-500 text-sm">
       Don&apos;t have an account?&nbsp;
-      <CustomLink styles="text-black hover:underline" href="/signup"> Sign up here </CustomLink>
+      <CustomLink styles="text-black hover:text-neutral-100 hover:underline" href="/signup">
+        Sign up here
+      </CustomLink>
     </p>
   </AuthLayout>
 </template>

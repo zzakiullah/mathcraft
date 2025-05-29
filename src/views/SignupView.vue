@@ -6,11 +6,15 @@ import AuthLayout from "@/layouts/AuthLayout.vue";
 import CustomButton from "@/components/inputs/CustomButton.vue";
 import CustomLink from "@/components/inputs/CustomLink.vue";
 import IconGoogle from "@/components/icons/IconGoogle.vue";
-import { signUpWithEmail } from "@/lib/db/auth";
+import { signUpWithEmail, isUsernameUnique } from "@/lib/db/auth";
 
+const username = ref("");
 const email = ref("");
 const password = ref("");
-const username = ref("");
+
+const usernameErrorMsg = ref("");
+const emailErrorMsg = ref("");
+const passwordErrorMsg = ref("");
 
 const showPwConds = ref(false);
 const pwHasUpper = ref(false);
@@ -35,23 +39,59 @@ function validatePassword() {
 }
 
 async function onSubmit() {
+  if (username.value === "") {
+    usernameErrorMsg.value = "Username is required.";
+    return;
+  } else {
+    usernameErrorMsg.value = "";
+  }
+  if (email.value === "") {
+    emailErrorMsg.value = "Email is required.";
+    return;
+  } else {
+    emailErrorMsg.value = "";
+  }
+  if (password.value === "") {
+    passwordErrorMsg.value = "Password is required.";
+    return;
+  } else {
+    passwordErrorMsg.value = "";
+  }
+
   const isPasswordValid = validatePassword();
-  if (isPasswordValid) {
-    const { data, error } = await signUpWithEmail(email.value, password.value, username.value);
-    if (error) {
-      console.log(error);
-      switch (error.code) {
-        case "email_address_invalid":
-          break;
-        case "email_exists":
-          break;
-        default:
-          break;
-      }
-    } else {
-      console.log(data.session);
+  if (!isPasswordValid) {
+    passwordErrorMsg.value = "Password does not meet all requirements.";
+    return;
+  }
+
+  const isValidUsername = isUsernameUnique(username.value);
+  if (isValidUsername === null) {
+    // An error occurred. Try again.
+  } else if (!isValidUsername) {
+    usernameErrorMsg.value = "This username is taken. Try another.";
+    return;
+  }
+
+  const { data, error } = await signUpWithEmail(email.value, password.value, username.value);
+  if (error) {
+    switch (error.code) {
+      case "email_address_invalid":
+        emailErrorMsg.value = "Please enter a valid email address.";
+        return;
+      case "email_exists":
+        emailErrorMsg.value = "This email is already being used.";
+        return;
+      case "weak_password":
+        // User is signing up or changing their password without meeting the password strength criteria.
+        // Use the AuthWeakPasswordError class to access more information about what they need to do to make the password pass.
+        emailErrorMsg.value = "Password does not meet strength criteria.";
+        return;
+      default:
+        console.log(error.code, error);
+        return;
     }
   } else {
+    console.log(data.session);
   }
 }
 </script>
@@ -78,56 +118,79 @@ async function onSubmit() {
         <input
           v-model="username"
           id="username"
-          class="text-sm text-black border border-neutral-300 rounded-lg px-4 py-2 placeholder:text-neutral-300"
+          class="text-sm text-black border rounded-lg px-4 py-2 placeholder:text-neutral-300"
+          :class="usernameErrorMsg === '' ? 'border-neutral-300' : 'border-red-600'"
           type="text"
           placeholder="themathcrafter"
         />
+        <div v-if="usernameErrorMsg" class="flex flex-row items-center gap-1 mt-0.5 text-red-600">
+          <Icon icon="material-symbols:error-rounded" />
+          <p class="text-xs">{{ usernameErrorMsg }}</p>
+        </div>
       </div>
       <div class="w-full flex flex-col gap-1">
         <label class="text-sm text-black" for="email"> Email </label>
         <input
           v-model="email"
           id="email"
-          class="text-sm text-black border border-neutral-300 rounded-lg px-4 py-2 placeholder:text-neutral-300"
+          class="text-sm text-black border rounded-lg px-4 py-2 placeholder:text-neutral-300"
+          :class="emailErrorMsg === '' ? 'border-neutral-300' : 'border-red-600'"
           type="email"
           placeholder="themathcrafter@example.com"
         />
+        <div v-if="emailErrorMsg" class="flex flex-row items-center gap-1 mt-0.5 text-red-600">
+          <Icon icon="material-symbols:error-rounded" />
+          <p class="text-xs">{{ emailErrorMsg }}</p>
+        </div>
       </div>
       <div class="w-full flex flex-col gap-1">
         <label class="text-sm text-black" for="password"> Password </label>
         <input
           v-model="password"
           id="password"
-          class="text-sm text-black border border-neutral-300 rounded-lg px-4 py-2 placeholder:text-neutral-300"
+          class="text-sm text-black border rounded-lg px-4 py-2 placeholder:text-neutral-300"
+          :class="passwordErrorMsg === '' ? 'border-neutral-300' : 'border-red-600'"
           type="password"
           placeholder="••••••••"
           @focus="showPwConds = true"
           @input="validatePassword"
         />
+        <div v-if="passwordErrorMsg" class="flex flex-row items-center gap-1 mt-0.5 text-red-600">
+          <Icon icon="material-symbols:error-rounded" />
+          <p class="text-xs">{{ passwordErrorMsg }}</p>
+        </div>
       </div>
       <div v-if="showPwConds" class="w-full flex flex-col text-neutral-500">
         <div class="flex flex-row items-center gap-1">
-          <Icon v-if="pwHasUpper" icon="material-symbols:check-circle" />
+          <Icon v-if="pwHasUpper" icon="material-symbols:check-circle" class="text-green-700" />
           <Icon v-else icon="material-symbols:circle-outline" />
           <p class="text-sm">Uppercase letter</p>
         </div>
         <div class="flex flex-row items-center gap-1">
-          <Icon v-if="pwHasLower" icon="material-symbols:check-circle" />
+          <Icon v-if="pwHasLower" icon="material-symbols:check-circle" class="text-green-700" />
           <Icon v-else icon="material-symbols:circle-outline" />
           <p class="text-sm">Lowercase letter</p>
         </div>
         <div class="flex flex-row items-center gap-1">
-          <Icon v-if="pwHasNum" icon="material-symbols:check-circle" />
+          <Icon v-if="pwHasNum" icon="material-symbols:check-circle" class="text-green-700" />
           <Icon v-else icon="material-symbols:circle-outline" />
           <p class="text-sm">Number letter</p>
         </div>
         <div class="flex flex-row items-center gap-1">
-          <Icon v-if="pwHasSpecialChar" icon="material-symbols:check-circle" />
+          <Icon
+            v-if="pwHasSpecialChar"
+            icon="material-symbols:check-circle"
+            class="text-green-700"
+          />
           <Icon v-else icon="material-symbols:circle-outline" />
           <p class="text-sm">Special character (e.g. !?&lt;&gt;@#$%)</p>
         </div>
         <div class="flex flex-row items-center gap-1">
-          <Icon v-if="pwHasOver8Chars" icon="material-symbols:check-circle" />
+          <Icon
+            v-if="pwHasOver8Chars"
+            icon="material-symbols:check-circle"
+            class="text-green-700"
+          />
           <Icon v-else icon="material-symbols:circle-outline" />
           <p class="text-sm">8 characters or more</p>
         </div>

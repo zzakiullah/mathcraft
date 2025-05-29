@@ -21,3 +21,15 @@ export async function signInWithGoogle() {
   const { data, error } = await supabase.auth.signInWithOAuth({ provider: "google" });
   return { data, error };
 }
+
+export async function isUsernameUnique(username: string) {
+  const { data, error } = await supabase
+    .from("users")
+    .select("username")
+    .eq("username", username)
+    .limit(1);
+  if (error) {
+    return null;
+  }
+  return data.length === 0;
+}

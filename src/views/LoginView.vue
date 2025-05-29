@@ -10,13 +10,13 @@ import IconGoogle from "@/components/icons/IconGoogle.vue";
 <template>
   <AuthLayout>
     <div class="w-full flex flex-row items-center justify-start">
-      <CustomLink styles="text-sm text-neutral-300 hover:underline" href="/">
+      <CustomLink styles="text-sm text-neutral-400 hover:underline" href="/">
         <Icon icon="ion:arrow-back" /> Back to home
       </CustomLink>
     </div>
     <div class="flex flex-col items-center justify-center gap-1">
       <h1 class="font-bold text-3xl text-black text-center">Login</h1>
-      <p class="text-sm text-neutral-400 text-center">Welcome back</p>
+      <p class="text-sm text-neutral-500 text-center">Welcome back</p>
     </div>
     <form class="w-full flex flex-col items-center justify-center gap-3 mt-2">
       <div class="w-full flex flex-col gap-1">

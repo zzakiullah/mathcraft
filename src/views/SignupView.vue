@@ -11,6 +11,7 @@ import { signUpWithEmail, isUsernameUnique } from "@/lib/db/auth";
 const loading = ref(false);
 const errorOccurred = ref(false);
 const sentConfirmationEmail = ref(false);
+const showPassword = ref(false);
 
 const username = ref("");
 const email = ref("");
@@ -68,6 +69,32 @@ async function onSubmit() {
     passwordErrorMsg.value = "";
   }
 
+  const isUsernameNotLettersNumbers = /^[-_]+$/i.test(username.value);
+  if (isUsernameNotLettersNumbers) {
+    usernameErrorMsg.value = "Username must contain at least one letter or number.";
+    loading.value = false;
+    return;
+  }
+
+  const isUsernameValid = /^[-_a-z0-9]+$/i.test(username.value);
+  if (!isUsernameValid) {
+    usernameErrorMsg.value =
+      "Username must only contain letters, numbers, hyphens, and underscores.";
+    loading.value = false;
+    return;
+  }
+
+  const isNewUsername = isUsernameUnique(username.value);
+  if (isNewUsername === null) {
+    errorOccurred.value = true;
+    loading.value = false;
+    return;
+  } else if (!isNewUsername) {
+    usernameErrorMsg.value = "That username is taken. Try another.";
+    loading.value = false;
+    return;
+  }
+
   const isPasswordValid = validatePassword();
   if (!isPasswordValid) {
     passwordErrorMsg.value = "Password does not meet all requirements.";
@@ -75,18 +102,7 @@ async function onSubmit() {
     return;
   }
 
-  const isValidUsername = isUsernameUnique(username.value);
-  if (isValidUsername === null) {
-    errorOccurred.value = true;
-    loading.value = false;
-    return;
-  } else if (!isValidUsername) {
-    usernameErrorMsg.value = "That username is taken. Try another.";
-    loading.value = false;
-    return;
-  }
-
-  const { data, error } = await signUpWithEmail(email.value, password.value, username.value);
+  const { error } = await signUpWithEmail(email.value, password.value, username.value);
   if (error) {
     switch (error.code) {
       case "email_address_invalid":
@@ -103,7 +119,6 @@ async function onSubmit() {
         break;
     }
   } else {
-    console.log(data.session);
     sentConfirmationEmail.value = true;
   }
   loading.value = false;
@@ -168,7 +183,7 @@ async function onSubmit() {
           type="text"
           placeholder="themathcrafter"
         />
-        <div v-if="usernameErrorMsg" class="flex flex-row items-center gap-1 mt-0.5 text-red-600">
+        <div v-if="usernameErrorMsg" class="flex flex-row items-start gap-1 mt-0.5 text-red-600">
           <Icon icon="material-symbols:error-rounded" />
           <p class="text-xs">{{ usernameErrorMsg }}</p>
         </div>
@@ -183,24 +198,34 @@ async function onSubmit() {
           type="email"
           placeholder="themathcrafter@example.com"
         />
-        <div v-if="emailErrorMsg" class="flex flex-row items-center gap-1 mt-0.5 text-red-600">
+        <div v-if="emailErrorMsg" class="flex flex-row items-start gap-1 mt-0.5 text-red-600">
           <Icon icon="material-symbols:error-rounded" />
           <p class="text-xs">{{ emailErrorMsg }}</p>
         </div>
       </div>
       <div class="w-full flex flex-col gap-1">
         <label class="text-sm text-black" for="password"> Password </label>
-        <input
-          v-model="password"
-          id="password"
-          class="text-sm text-black border rounded-lg px-4 py-2 placeholder:text-neutral-300"
-          :class="passwordErrorMsg === '' ? 'border-neutral-300' : 'border-red-600'"
-          type="password"
-          placeholder="••••••••"
-          @focus="showPwConds = true"
-          @input="validatePassword"
-        />
-        <div v-if="passwordErrorMsg" class="flex flex-row items-center gap-1 mt-0.5 text-red-600">
+        <div class="w-full relative">
+          <input
+            v-model="password"
+            id="password"
+            class="w-full text-sm text-black border rounded-lg pl-4 pr-10 py-2 placeholder:text-neutral-300"
+            :class="passwordErrorMsg === '' ? 'border-neutral-300' : 'border-red-600'"
+            :type="showPassword ? 'text' : 'password'"
+            placeholder="••••••••"
+            @focus="showPwConds = true"
+            @input="validatePassword"
+          />
+          <CustomButton
+            styles="absolute top-0 bottom-0 right-0 flex flex-row items-center justify-center px-3 py-2 text-neutral-500"
+            ariaLabel="Toggle show/hide password"
+            :onClick="() => (showPassword = !showPassword)"
+          >
+            <Icon v-show="showPassword" icon="ion:eye-off" />
+            <Icon v-show="!showPassword" icon="ion:eye" />
+          </CustomButton>
+        </div>
+        <div v-if="passwordErrorMsg" class="flex flex-row items-start gap-1 mt-0.5 text-red-600">
           <Icon icon="material-symbols:error-rounded" />
           <p class="text-xs">{{ passwordErrorMsg }}</p>
         </div>

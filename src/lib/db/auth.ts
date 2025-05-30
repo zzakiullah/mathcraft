@@ -26,7 +26,7 @@ export async function isUsernameUnique(username: string) {
   const { data, error } = await supabase
     .from("users")
     .select("username")
-    .eq("username", username)
+    .ilike("username", username)
     .limit(1);
   if (error) {
     return null;

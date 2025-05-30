@@ -2,6 +2,14 @@
  * Functions for handling vectors in the canvas
  */
 
-export function createVector(context: CanvasRenderingContext2D) {}
+export function createVector(ctx: CanvasRenderingContext2D) {
+  ctx.beginPath();
 
-export function updateVector(context: CanvasRenderingContext2D) {}
+  ctx.stroke();
+}
+
+export function updateVector(ctx: CanvasRenderingContext2D) {
+  ctx.beginPath();
+
+  ctx.stroke();
+}

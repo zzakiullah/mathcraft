@@ -244,7 +244,7 @@ async function onSubmit() {
         <div class="flex flex-row items-center gap-1">
           <Icon v-if="pwHasNum" icon="material-symbols:check-circle" class="text-green-700" />
           <Icon v-else icon="material-symbols:circle-outline" />
-          <p class="text-sm">Number letter</p>
+          <p class="text-sm">Number</p>
         </div>
         <div class="flex flex-row items-center gap-1">
           <Icon

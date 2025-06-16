@@ -33,3 +33,14 @@ export async function isUsernameUnique(username: string) {
   }
   return data.length === 0;
 }
+
+export async function resendConfirmationEmail(email: string) {
+  const { error } = await supabase.auth.resend({
+    type: "signup",
+    email: email,
+    options: {
+      emailRedirectTo: "https://zulaikha.me/mathcraft/dashboard",
+    },
+  });
+  return { error };
+}

@@ -7,6 +7,11 @@
   position: relative;
 }
 
+/* Canvas */
+canvas {
+  shape-rendering: crispEdges;
+}
+
 /* Custom transitions */
 .custom-transition-default {
   transition: all 0.3s ease-in-out;

@@ -23,17 +23,13 @@ onMounted(() => {
 
 <template>
   <SandboxLayout>
-    <div class="w-screen h-screen flex flex-row pt-14">
-      <nav class="side-panel w-md border border-red-500"></nav>
-      <main ref="main-container" class="interactive-pane grow">
+    <main class="w-screen h-screen flex flex-row pt-14">
+      <div class="side-panel w-md border border-red-500"></div>
+      <div ref="main-container" class="interactive-pane grow">
         <canvas ref="canvas-2d"></canvas>
-      </main>
-    </div>
+      </div>
+    </main>
   </SandboxLayout>
 </template>
 
-<style scoped>
-canvas {
-  shape-rendering: crispEdges;
-}
-</style>
+<style scoped></style>

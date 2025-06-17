@@ -2,23 +2,98 @@
  * Functions for handling the grid in the canvas
  */
 
-export function createGrid(ctx: CanvasRenderingContext2D, width: number, height: number) {
-  console.log(width, height);
-  ctx.beginPath();
-  // ctx.strokeStyle = "blue";
-  ctx.globalAlpha = 1;
-  ctx.lineWidth = 1;
+function renderAxisValue(ctx: CanvasRenderingContext2D, value: number, x: number, y: number) {
+  ctx.strokeStyle = "white";
+  ctx.strokeText(`${value}`, x, y);
+  ctx.fillStyle = "black";
+  ctx.fillText(`${value}`, x, y);
+}
 
-  for (let i = 1; i < 10; i++) {
-    const div = height / 10;
-    ctx.moveTo(0, div * i);
-    ctx.lineTo(width, div * i);
+export function createGrid(ctx: CanvasRenderingContext2D, width: number, height: number) {
+  ctx.beginPath();
+  ctx.globalAlpha = 1;
+
+  const majorGridSize = 100;
+  const minorGridSize = 25;
+  const labelOffset = 4;
+
+  const halfWidth = width / 2;
+  const halfHeight = height / 2;
+
+  ctx.strokeStyle = "#979797";
+  ctx.lineWidth = 0.5;
+
+  // Vertical minor lines
+  for (let i = minorGridSize; i < width; i += minorGridSize) {
+    ctx.moveTo(halfWidth + i, 0);
+    ctx.lineTo(halfWidth + i, height);
+    ctx.moveTo(halfWidth - i, 0);
+    ctx.lineTo(halfWidth - i, height);
   }
 
-  for (let i = 1; i < 10; i++) {
-    const div = width / 10;
-    ctx.moveTo(div * i, 0);
-    ctx.lineTo(div * i, height);
+  // Horizontal major lines
+  for (let i = minorGridSize; i < height; i += minorGridSize) {
+    ctx.moveTo(0, halfHeight + i);
+    ctx.lineTo(width, halfHeight + i);
+    ctx.moveTo(0, halfHeight - i);
+    ctx.lineTo(width, halfHeight - i);
+  }
+
+  ctx.stroke();
+  ctx.beginPath();
+  ctx.lineWidth = 1;
+
+  // Vertical major lines
+  for (let i = majorGridSize; i < width; i += majorGridSize) {
+    ctx.moveTo(halfWidth + i, 0);
+    ctx.lineTo(halfWidth + i, height);
+    ctx.moveTo(halfWidth - i, 0);
+    ctx.lineTo(halfWidth - i, height);
+  }
+
+  // Horizontal major lines
+  for (let i = majorGridSize; i < height; i += majorGridSize) {
+    ctx.moveTo(0, halfHeight + i);
+    ctx.lineTo(width, halfHeight + i);
+    ctx.moveTo(0, halfHeight - i);
+    ctx.lineTo(width, halfHeight - i);
+  }
+
+  ctx.stroke();
+  ctx.beginPath();
+
+  // Center axis
+  ctx.strokeStyle = "black";
+  ctx.lineWidth = 1.5;
+  ctx.moveTo(halfWidth, 0);
+  ctx.lineTo(halfWidth, height);
+  ctx.moveTo(0, halfHeight);
+  ctx.lineTo(width, halfHeight);
+
+  ctx.stroke();
+  ctx.beginPath();
+
+  // Origin axis label
+  ctx.lineWidth = 4;
+  ctx.font = "14px Arial";
+  ctx.textAlign = "right";
+  ctx.textBaseline = "top";
+  renderAxisValue(ctx, 0, halfWidth - labelOffset, halfHeight + labelOffset);
+
+  // Vertical axis labels
+  ctx.textAlign = "right";
+  ctx.textBaseline = "middle";
+  for (let i = 1; i * majorGridSize < height; i++) {
+    renderAxisValue(ctx, i * -2, halfWidth - labelOffset, halfHeight + i * majorGridSize);
+    renderAxisValue(ctx, i * 2, halfWidth - labelOffset, halfHeight - i * majorGridSize);
+  }
+
+  // Horizontal axis labels
+  ctx.textAlign = "center";
+  ctx.textBaseline = "top";
+  for (let i = 1; i * majorGridSize < width; i++) {
+    renderAxisValue(ctx, i * 2, halfWidth + i * majorGridSize, halfHeight + labelOffset);
+    renderAxisValue(ctx, i * -2, halfWidth - i * majorGridSize, halfHeight + labelOffset);
   }
 
   ctx.stroke();

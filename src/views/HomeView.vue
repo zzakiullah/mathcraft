@@ -9,8 +9,8 @@ import CustomButton from "@/components/inputs/CustomButton.vue";
   <DefaultLayout>
     <main>
       <div class="heading-container">
-        <h1 class="main-heading">Mathcraft</h1>
-        <p class="main-subheading">An interactive math sandbox</p>
+        <h1 class="text-7xl text-center font-semibold leading-none">Learn by playing</h1>
+        <p class="text-xl text-center leading-none">Make math fun with our interactive sandbox</p>
         <div class="main-btn-container">
           <CustomButton
             styles="border-2 rounded-full bg-blue-800 border-blue-800 text-white px-4 py-3 hover:bg-blue-700 hover:border-blue-700"
@@ -46,19 +46,6 @@ main {
   align-items: center;
   justify-content: center;
   gap: 1rem;
-}
-
-.main-heading {
-  font-size: 4.5rem;
-  font-weight: 600;
-  text-align: center;
-  line-height: 1;
-}
-
-.main-subheading {
-  font-size: 1.25rem;
-  text-align: center;
-  line-height: 1;
 }
 
 .main-btn-container {

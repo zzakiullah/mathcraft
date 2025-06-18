@@ -13,14 +13,19 @@ export function clearGrid(ctx: CanvasRenderingContext2D, width: number, height: 
   ctx.clearRect(0, 0, width, height);
 }
 
-export function createGrid(ctx: CanvasRenderingContext2D, width: number, height: number) {
+export function createGrid(
+  ctx: CanvasRenderingContext2D,
+  width: number,
+  height: number,
+  majorGridSize: number,
+  minorGridSize: number,
+  xIncrement: number,
+  yIncrement: number,
+) {
   ctx.beginPath();
   ctx.globalAlpha = 1;
 
-  const majorGridSize = 100;
-  const minorGridSize = 25;
   const labelOffset = 4;
-
   const halfWidth = width / 2;
   const halfHeight = height / 2;
 
@@ -88,16 +93,16 @@ export function createGrid(ctx: CanvasRenderingContext2D, width: number, height:
   ctx.textAlign = "right";
   ctx.textBaseline = "middle";
   for (let i = 1; i * majorGridSize < height; i++) {
-    renderAxisValue(ctx, i * -2, halfWidth - labelOffset, halfHeight + i * majorGridSize);
-    renderAxisValue(ctx, i * 2, halfWidth - labelOffset, halfHeight - i * majorGridSize);
+    renderAxisValue(ctx, i * -yIncrement, halfWidth - labelOffset, halfHeight + i * majorGridSize);
+    renderAxisValue(ctx, i * yIncrement, halfWidth - labelOffset, halfHeight - i * majorGridSize);
   }
 
   // Horizontal axis labels
   ctx.textAlign = "center";
   ctx.textBaseline = "top";
   for (let i = 1; i * majorGridSize < width; i++) {
-    renderAxisValue(ctx, i * 2, halfWidth + i * majorGridSize, halfHeight + labelOffset);
-    renderAxisValue(ctx, i * -2, halfWidth - i * majorGridSize, halfHeight + labelOffset);
+    renderAxisValue(ctx, i * xIncrement, halfWidth + i * majorGridSize, halfHeight + labelOffset);
+    renderAxisValue(ctx, i * -xIncrement, halfWidth - i * majorGridSize, halfHeight + labelOffset);
   }
 
   ctx.stroke();

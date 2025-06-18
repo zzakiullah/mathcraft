@@ -18,8 +18,10 @@ const width = ref(100);
 const height = ref(100);
 const majorGridSize = ref(INITIAL_MAJOR_DIVISION_SIZE);
 const minorGridSize = ref(INITIAL_MINOR_DIVISION_SIZE);
-const xIncrement = ref(2);
-const yIncrement = ref(2);
+const xAxisIncrement = ref(2);
+const yAxisIncrement = ref(2);
+const xOriginOffset = ref(0);
+const yOriginOffset = ref(0);
 
 onMounted(() => {
   width.value = container.value!.clientWidth;
@@ -34,8 +36,10 @@ onMounted(() => {
     height.value,
     majorGridSize.value,
     minorGridSize.value,
-    xIncrement.value,
-    yIncrement.value,
+    xAxisIncrement.value,
+    yAxisIncrement.value,
+    xOriginOffset.value,
+    yOriginOffset.value,
   );
 
   window.addEventListener("resize", handleResize);
@@ -53,8 +57,10 @@ const repaintGrid = () => {
     height.value,
     majorGridSize.value,
     minorGridSize.value,
-    xIncrement.value,
-    yIncrement.value,
+    xAxisIncrement.value,
+    yAxisIncrement.value,
+    xOriginOffset.value,
+    yOriginOffset.value,
   );
 };
 
@@ -64,8 +70,8 @@ const zoomIn = () => {
   if (majorGridSize.value >= INITIAL_MAJOR_DIVISION_SIZE * MAJOR_DIVISION_SCALE) {
     majorGridSize.value = majorGridSize.value / 2;
     minorGridSize.value = minorGridSize.value / 2;
-    xIncrement.value = xIncrement.value / 2;
-    yIncrement.value = yIncrement.value / 2;
+    xAxisIncrement.value = xAxisIncrement.value / 2;
+    yAxisIncrement.value = yAxisIncrement.value / 2;
   }
   repaintGrid();
 };
@@ -76,8 +82,8 @@ const zoomOut = () => {
   if (majorGridSize.value <= INITIAL_MAJOR_DIVISION_SIZE / MAJOR_DIVISION_SCALE) {
     majorGridSize.value = majorGridSize.value * 2;
     minorGridSize.value = minorGridSize.value * 2;
-    xIncrement.value = xIncrement.value * 2;
-    yIncrement.value = yIncrement.value * 2;
+    xAxisIncrement.value = xAxisIncrement.value * 2;
+    yAxisIncrement.value = yAxisIncrement.value * 2;
   }
   repaintGrid();
 };
@@ -91,7 +97,7 @@ const handleResize = () => {
 };
 
 const onWheel = (y: number) => {
-  console.log("wheel");
+  console.log(y);
   // Scroll up (zoom in)
   if (y < 0) {
     zoomIn();
@@ -103,7 +109,6 @@ const onWheel = (y: number) => {
 };
 
 const onPinch = (vd: number) => {
-  console.log("pinch");
   // Pinch out (zoom in)
   if (vd > 0) {
     zoomIn();
@@ -114,10 +119,17 @@ const onPinch = (vd: number) => {
   }
 };
 
+const onDrag = (x: number, y: number) => {
+  xOriginOffset.value = xOriginOffset.value + x;
+  yOriginOffset.value = yOriginOffset.value + y;
+  repaintGrid();
+};
+
 useGesture(
   {
     onWheel: ({ movement: [, y] }) => onWheel(y),
     onPinch: ({ vdva: [vd] }) => onPinch(vd),
+    onDrag: ({ delta: [x, y] }) => onDrag(x, y),
   },
   {
     domTarget: canvas,

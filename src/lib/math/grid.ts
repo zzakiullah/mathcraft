@@ -19,8 +19,10 @@ export function createGrid(
   height: number,
   majorGridSize: number,
   minorGridSize: number,
-  xIncrement: number,
-  yIncrement: number,
+  xAxisIncrement: number,
+  yAxisIncrement: number,
+  xOriginOffset: number,
+  yOriginOffset: number,
 ) {
   ctx.beginPath();
   ctx.globalAlpha = 1;
@@ -29,23 +31,30 @@ export function createGrid(
   const halfWidth = width / 2;
   const halfHeight = height / 2;
 
+  const startX = halfWidth + xOriginOffset;
+  const startY = halfHeight + yOriginOffset;
+
   ctx.strokeStyle = "#979797";
   ctx.lineWidth = 0.5;
 
   // Vertical minor lines
-  for (let i = minorGridSize; i < width; i += minorGridSize) {
-    ctx.moveTo(halfWidth + i, 0);
-    ctx.lineTo(halfWidth + i, height);
-    ctx.moveTo(halfWidth - i, 0);
-    ctx.lineTo(halfWidth - i, height);
+  for (let i = minorGridSize; startX + i < width; i += minorGridSize) {
+    ctx.moveTo(startX + i, 0);
+    ctx.lineTo(startX + i, height);
+  }
+  for (let i = minorGridSize; startX - i > 0; i += minorGridSize) {
+    ctx.moveTo(startX - i, 0);
+    ctx.lineTo(startX - i, height);
   }
 
   // Horizontal major lines
-  for (let i = minorGridSize; i < height; i += minorGridSize) {
-    ctx.moveTo(0, halfHeight + i);
-    ctx.lineTo(width, halfHeight + i);
-    ctx.moveTo(0, halfHeight - i);
-    ctx.lineTo(width, halfHeight - i);
+  for (let i = minorGridSize; startY + i < height; i += minorGridSize) {
+    ctx.moveTo(0, startY + i);
+    ctx.lineTo(width, startY + i);
+  }
+  for (let i = minorGridSize; startY - i > 0; i += minorGridSize) {
+    ctx.moveTo(0, startY - i);
+    ctx.lineTo(width, startY - i);
   }
 
   ctx.stroke();
@@ -53,19 +62,23 @@ export function createGrid(
   ctx.lineWidth = 1;
 
   // Vertical major lines
-  for (let i = majorGridSize; i < width; i += majorGridSize) {
-    ctx.moveTo(halfWidth + i, 0);
-    ctx.lineTo(halfWidth + i, height);
-    ctx.moveTo(halfWidth - i, 0);
-    ctx.lineTo(halfWidth - i, height);
+  for (let i = majorGridSize; startX + i < width; i += majorGridSize) {
+    ctx.moveTo(startX + i, 0);
+    ctx.lineTo(startX + i, height);
+  }
+  for (let i = majorGridSize; startX - i > 0; i += majorGridSize) {
+    ctx.moveTo(startX - i, 0);
+    ctx.lineTo(startX - i, height);
   }
 
   // Horizontal major lines
-  for (let i = majorGridSize; i < height; i += majorGridSize) {
-    ctx.moveTo(0, halfHeight + i);
-    ctx.lineTo(width, halfHeight + i);
-    ctx.moveTo(0, halfHeight - i);
-    ctx.lineTo(width, halfHeight - i);
+  for (let i = majorGridSize; startY + i < height; i += majorGridSize) {
+    ctx.moveTo(0, startY + i);
+    ctx.lineTo(width, startY + i);
+  }
+  for (let i = majorGridSize; startY - i > 0; i += majorGridSize) {
+    ctx.moveTo(0, startY - i);
+    ctx.lineTo(width, startY - i);
   }
 
   ctx.stroke();
@@ -74,10 +87,10 @@ export function createGrid(
   // Center axis
   ctx.strokeStyle = "black";
   ctx.lineWidth = 1.5;
-  ctx.moveTo(halfWidth, 0);
-  ctx.lineTo(halfWidth, height);
-  ctx.moveTo(0, halfHeight);
-  ctx.lineTo(width, halfHeight);
+  ctx.moveTo(startX, 0);
+  ctx.lineTo(startX, height);
+  ctx.moveTo(0, startY);
+  ctx.lineTo(width, startY);
 
   ctx.stroke();
   ctx.beginPath();
@@ -87,22 +100,22 @@ export function createGrid(
   ctx.font = "14px sans-serif";
   ctx.textAlign = "right";
   ctx.textBaseline = "top";
-  renderAxisValue(ctx, 0, halfWidth - labelOffset, halfHeight + labelOffset);
+  renderAxisValue(ctx, 0, startX - labelOffset, startY + labelOffset);
 
   // Vertical axis labels
   ctx.textAlign = "right";
   ctx.textBaseline = "middle";
   for (let i = 1; i * majorGridSize < height; i++) {
-    renderAxisValue(ctx, i * -yIncrement, halfWidth - labelOffset, halfHeight + i * majorGridSize);
-    renderAxisValue(ctx, i * yIncrement, halfWidth - labelOffset, halfHeight - i * majorGridSize);
+    renderAxisValue(ctx, i * -yAxisIncrement, startX - labelOffset, startY + i * majorGridSize);
+    renderAxisValue(ctx, i * yAxisIncrement, startX - labelOffset, startY - i * majorGridSize);
   }
 
   // Horizontal axis labels
   ctx.textAlign = "center";
   ctx.textBaseline = "top";
   for (let i = 1; i * majorGridSize < width; i++) {
-    renderAxisValue(ctx, i * xIncrement, halfWidth + i * majorGridSize, halfHeight + labelOffset);
-    renderAxisValue(ctx, i * -xIncrement, halfWidth - i * majorGridSize, halfHeight + labelOffset);
+    renderAxisValue(ctx, i * xAxisIncrement, startX + i * majorGridSize, startY + labelOffset);
+    renderAxisValue(ctx, i * -xAxisIncrement, startX - i * majorGridSize, startY + labelOffset);
   }
 
   ctx.stroke();

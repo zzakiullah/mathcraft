@@ -1,12 +1,14 @@
 <script setup lang="ts">
-import { onMounted, ref, useTemplateRef } from "vue";
+import { onUnmounted, onMounted, ref, useTemplateRef } from "vue";
+import { GesturePlugin } from "@vueuse/gesture";
 
 import SandboxLayout from "@/layouts/SandboxLayout.vue";
-import { createGrid } from "@/lib/math/grid";
+import { clearGrid, createGrid } from "@/lib/math/grid";
 
 const container = useTemplateRef("main-container");
 const canvas = useTemplateRef("canvas-2d");
 
+const context = ref<CanvasRenderingContext2D>();
 const width = ref(100);
 const height = ref(100);
 
@@ -16,17 +18,44 @@ onMounted(() => {
   canvas.value!.width = width.value;
   canvas.value!.height = height.value;
 
-  const context = canvas.value!.getContext("2d");
-  createGrid(context!, width.value, height.value);
+  context.value = canvas.value!.getContext("2d")!;
+  createGrid(context.value, width.value, height.value);
+
+  window.addEventListener("resize", handleResize);
 });
+
+onUnmounted(() => {
+  window.removeEventListener("resize", handleResize);
+});
+
+const handleResize = () => {
+  width.value = container.value!.clientWidth;
+  height.value = container.value!.clientHeight;
+  canvas.value!.width = width.value;
+  canvas.value!.height = height.value;
+
+  clearGrid(context.value!, width.value, height.value);
+  createGrid(context.value!, width.value, height.value);
+};
+
+const onMouseWheel = (event: WheelEvent) => {
+  event.preventDefault();
+  // Scroll up
+  if (event.deltaY < 0) {
+  }
+  // Scroll down
+  else {
+  }
+  console.log(event.deltaY);
+};
 </script>
 
 <template>
   <SandboxLayout>
     <main class="w-screen h-screen flex flex-row pt-14">
       <div class="side-panel w-md border border-red-500"></div>
-      <div ref="main-container" class="interactive-pane grow">
-        <canvas ref="canvas-2d"></canvas>
+      <div ref="main-container" class="interactive-pane grow overflow-hidden">
+        <canvas ref="canvas-2d" @wheel="onMouseWheel"></canvas>
       </div>
     </main>
   </SandboxLayout>

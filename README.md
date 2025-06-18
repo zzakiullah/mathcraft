@@ -1,4 +1,6 @@
-# math-sandbox
+# Mathcraft
+
+An interactive math sandbox. Takes inspiration from Desmos and Notion.
 
 This template should help get you started developing with Vue 3 in Vite.
 

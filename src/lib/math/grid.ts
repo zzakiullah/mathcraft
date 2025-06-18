@@ -2,11 +2,15 @@
  * Functions for handling the grid in the canvas
  */
 
-function renderAxisValue(ctx: CanvasRenderingContext2D, value: number, x: number, y: number) {
+const renderAxisValue = (ctx: CanvasRenderingContext2D, value: number, x: number, y: number) => {
   ctx.strokeStyle = "white";
   ctx.strokeText(`${value}`, x, y);
   ctx.fillStyle = "black";
   ctx.fillText(`${value}`, x, y);
+};
+
+export function clearGrid(ctx: CanvasRenderingContext2D, width: number, height: number) {
+  ctx.clearRect(0, 0, width, height);
 }
 
 export function createGrid(ctx: CanvasRenderingContext2D, width: number, height: number) {
@@ -75,7 +79,7 @@ export function createGrid(ctx: CanvasRenderingContext2D, width: number, height:
 
   // Origin axis label
   ctx.lineWidth = 4;
-  ctx.font = "14px Arial";
+  ctx.font = "14px sans-serif";
   ctx.textAlign = "right";
   ctx.textBaseline = "top";
   renderAxisValue(ctx, 0, halfWidth - labelOffset, halfHeight + labelOffset);
@@ -97,15 +101,4 @@ export function createGrid(ctx: CanvasRenderingContext2D, width: number, height:
   }
 
   ctx.stroke();
-}
-
-export function updateGrid(ctx: CanvasRenderingContext2D) {
-  ctx.lineWidth = 1;
-  ctx.beginPath();
-
-  for (let i = 0; i < 10; i++) {
-    ctx.moveTo(0, i);
-    ctx.lineTo(200, i);
-    ctx.stroke();
-  }
 }

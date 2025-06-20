@@ -166,11 +166,11 @@ const renderAxisValues = (
   }
 };
 
-export const clearGrid = (ctx: CanvasRenderingContext2D, width: number, height: number) => {
+const clearGrid = (ctx: CanvasRenderingContext2D, width: number, height: number) => {
   ctx.clearRect(0, 0, width, height);
 };
 
-export const createGrid = (
+const createGrid = (
   ctx: CanvasRenderingContext2D,
   width: number,
   height: number,
@@ -227,7 +227,7 @@ export const createGrid = (
   if (showVerticalOriginAxis && showHorizontalOriginAxis) {
     ctx.textAlign = "right";
     ctx.textBaseline = "top";
-    renderAxisValue(ctx, 0, originX - labelOffset, originY + labelOffset);
+    renderAxisValue(ctx, 0, originX - labelOffset, originY + labelOffset, BLACK);
   }
 
   renderAxisValues(
@@ -243,21 +243,7 @@ export const createGrid = (
     originY,
   );
 
-  // // Vertical axis labels
-  // ctx.textAlign = "right";
-  // ctx.textBaseline = "middle";
-  // for (let i = 1; i * majorGridSizeX < height; i++) {
-  //   renderAxisValue(ctx, i * -incrementY, originX - labelOffset, originY + i * majorGridSizeX);
-  //   renderAxisValue(ctx, i * incrementY, originX - labelOffset, originY - i * majorGridSizeX);
-  // }
-
-  // // Horizontal axis labels
-  // ctx.textAlign = "center";
-  // ctx.textBaseline = "top";
-  // for (let i = 1; i * majorGridSizeY < width; i++) {
-  //   renderAxisValue(ctx, i * incrementX, originX + i * majorGridSizeY, originY + labelOffset);
-  //   renderAxisValue(ctx, i * -incrementX, originX - i * majorGridSizeY, originY + labelOffset);
-  // }
-
   ctx.stroke();
 };
+
+export { clearGrid, createGrid };

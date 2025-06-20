@@ -16,12 +16,17 @@ const canvas = useTemplateRef("canvas-2d");
 const context = ref<CanvasRenderingContext2D>();
 const width = ref(100);
 const height = ref(100);
-const majorGridSize = ref(INITIAL_MAJOR_DIVISION_SIZE);
-const minorGridSize = ref(INITIAL_MINOR_DIVISION_SIZE);
-const xAxisIncrement = ref(2);
-const yAxisIncrement = ref(2);
-const xOriginOffset = ref(0);
-const yOriginOffset = ref(0);
+const offsetX = ref(0);
+const offsetY = ref(0);
+
+const majorGridSizeX = ref(INITIAL_MAJOR_DIVISION_SIZE);
+const majorGridSizeY = ref(INITIAL_MAJOR_DIVISION_SIZE);
+const minorGridSizeX = ref(INITIAL_MINOR_DIVISION_SIZE);
+const minorGridSizeY = ref(INITIAL_MINOR_DIVISION_SIZE);
+const incrementX = ref(2);
+const incrementY = ref(2);
+const originX = ref(width.value / 2);
+const originY = ref(width.value / 2);
 
 onMounted(() => {
   width.value = container.value!.clientWidth;
@@ -29,17 +34,25 @@ onMounted(() => {
   canvas.value!.width = width.value;
   canvas.value!.height = height.value;
 
+  const rect = container.value!.getBoundingClientRect();
+  offsetX.value = rect.x;
+  offsetY.value = rect.y;
+  originX.value = width.value / 2;
+  originY.value = height.value / 2;
+
   context.value = canvas.value!.getContext("2d")!;
   createGrid(
     context.value,
     width.value,
     height.value,
-    majorGridSize.value,
-    minorGridSize.value,
-    xAxisIncrement.value,
-    yAxisIncrement.value,
-    xOriginOffset.value,
-    yOriginOffset.value,
+    majorGridSizeX.value,
+    majorGridSizeY.value,
+    minorGridSizeX.value,
+    minorGridSizeY.value,
+    incrementX.value,
+    incrementY.value,
+    originX.value,
+    originY.value,
   );
 
   window.addEventListener("resize", handleResize);
@@ -55,35 +68,64 @@ const repaintGrid = () => {
     context.value!,
     width.value,
     height.value,
-    majorGridSize.value,
-    minorGridSize.value,
-    xAxisIncrement.value,
-    yAxisIncrement.value,
-    xOriginOffset.value,
-    yOriginOffset.value,
+    majorGridSizeX.value,
+    majorGridSizeY.value,
+    minorGridSizeX.value,
+    minorGridSizeY.value,
+    incrementX.value,
+    incrementY.value,
+    originX.value,
+    originY.value,
   );
 };
 
+const calculateNewOrigin = (pointerX: number, pointerY: number, zoomIn: boolean) => {
+  const oldDistX = originX.value - pointerX;
+  const oldDistY = originY.value - pointerY;
+
+  const deltaDivisionIncrement = zoomIn ? MAJOR_DIVISON_INCREMENT : -MAJOR_DIVISON_INCREMENT;
+
+  const newDistX =
+    ((majorGridSizeX.value + deltaDivisionIncrement) * oldDistX) / majorGridSizeX.value;
+  const newDistY =
+    ((majorGridSizeY.value + deltaDivisionIncrement) * oldDistY) / majorGridSizeY.value;
+
+  originX.value = newDistX + pointerX;
+  originY.value = newDistY + pointerY;
+};
+
 const zoomIn = () => {
-  majorGridSize.value = majorGridSize.value + MAJOR_DIVISON_INCREMENT;
-  minorGridSize.value = majorGridSize.value / MINOR_DIVISIONS;
-  if (majorGridSize.value >= INITIAL_MAJOR_DIVISION_SIZE * MAJOR_DIVISION_SCALE) {
-    majorGridSize.value = majorGridSize.value / 2;
-    minorGridSize.value = minorGridSize.value / 2;
-    xAxisIncrement.value = xAxisIncrement.value / 2;
-    yAxisIncrement.value = yAxisIncrement.value / 2;
+  majorGridSizeX.value = majorGridSizeX.value + MAJOR_DIVISON_INCREMENT;
+  minorGridSizeX.value = majorGridSizeX.value / MINOR_DIVISIONS;
+  majorGridSizeY.value = majorGridSizeY.value + MAJOR_DIVISON_INCREMENT;
+  minorGridSizeY.value = majorGridSizeY.value / MINOR_DIVISIONS;
+  if (majorGridSizeX.value >= INITIAL_MAJOR_DIVISION_SIZE * MAJOR_DIVISION_SCALE) {
+    majorGridSizeX.value = majorGridSizeX.value / MAJOR_DIVISION_SCALE;
+    minorGridSizeX.value = minorGridSizeX.value / MAJOR_DIVISION_SCALE;
+    incrementX.value = incrementX.value / MAJOR_DIVISION_SCALE;
+  }
+  if (majorGridSizeY.value >= INITIAL_MAJOR_DIVISION_SIZE * MAJOR_DIVISION_SCALE) {
+    majorGridSizeY.value = majorGridSizeY.value / MAJOR_DIVISION_SCALE;
+    minorGridSizeY.value = minorGridSizeY.value / MAJOR_DIVISION_SCALE;
+    incrementY.value = incrementY.value / MAJOR_DIVISION_SCALE;
   }
   repaintGrid();
 };
 
 const zoomOut = () => {
-  majorGridSize.value = majorGridSize.value - MAJOR_DIVISON_INCREMENT;
-  minorGridSize.value = majorGridSize.value / MINOR_DIVISIONS;
-  if (majorGridSize.value <= INITIAL_MAJOR_DIVISION_SIZE / MAJOR_DIVISION_SCALE) {
-    majorGridSize.value = majorGridSize.value * 2;
-    minorGridSize.value = minorGridSize.value * 2;
-    xAxisIncrement.value = xAxisIncrement.value * 2;
-    yAxisIncrement.value = yAxisIncrement.value * 2;
+  majorGridSizeX.value = majorGridSizeX.value - MAJOR_DIVISON_INCREMENT;
+  minorGridSizeX.value = majorGridSizeX.value / MINOR_DIVISIONS;
+  majorGridSizeY.value = majorGridSizeY.value - MAJOR_DIVISON_INCREMENT;
+  minorGridSizeY.value = majorGridSizeY.value / MINOR_DIVISIONS;
+  if (majorGridSizeX.value <= INITIAL_MAJOR_DIVISION_SIZE / MAJOR_DIVISION_SCALE) {
+    majorGridSizeX.value = majorGridSizeX.value * MAJOR_DIVISION_SCALE;
+    minorGridSizeX.value = minorGridSizeX.value * MAJOR_DIVISION_SCALE;
+    incrementX.value = incrementX.value * MAJOR_DIVISION_SCALE;
+  }
+  if (majorGridSizeY.value <= INITIAL_MAJOR_DIVISION_SIZE / MAJOR_DIVISION_SCALE) {
+    majorGridSizeY.value = majorGridSizeY.value * MAJOR_DIVISION_SCALE;
+    minorGridSizeY.value = minorGridSizeY.value * MAJOR_DIVISION_SCALE;
+    incrementY.value = incrementY.value * MAJOR_DIVISION_SCALE;
   }
   repaintGrid();
 };
@@ -91,44 +133,52 @@ const zoomOut = () => {
 const handleResize = () => {
   width.value = container.value!.clientWidth;
   height.value = container.value!.clientHeight;
+
+  originX.value = width.value / 2;
+  originY.value = height.value / 2;
+
   canvas.value!.width = width.value;
   canvas.value!.height = height.value;
   repaintGrid();
 };
 
-const onWheel = (y: number) => {
-  console.log(y);
+const onWheel = (y: number, pointerX: number, pointerY: number) => {
   // Scroll up (zoom in)
   if (y < 0) {
+    calculateNewOrigin(pointerX, pointerY, true);
     zoomIn();
   }
   // Scroll down  (zoom out)
   else {
+    calculateNewOrigin(pointerX, pointerY, false);
     zoomOut();
   }
 };
 
-const onPinch = (vd: number) => {
+const onPinch = (vd: number, pointerX: number, pointerY: number) => {
   // Pinch out (zoom in)
   if (vd > 0) {
+    calculateNewOrigin(pointerX, pointerY, true);
     zoomIn();
   }
   // Pinch in (zoom out)
   else {
+    calculateNewOrigin(pointerX, pointerY, false);
     zoomOut();
   }
 };
 
 const onDrag = (x: number, y: number) => {
-  xOriginOffset.value = xOriginOffset.value + x;
-  yOriginOffset.value = yOriginOffset.value + y;
+  originX.value = originX.value + x;
+  originY.value = originY.value + y;
   repaintGrid();
 };
 
 useGesture(
   {
-    onWheel: ({ movement: [, y] }) => onWheel(y),
-    onPinch: ({ vdva: [vd] }) => onPinch(vd),
+    onWheel: ({ movement: [, y], event }) => onWheel(y, event.offsetX, event.offsetY),
+    onPinch: ({ vdva: [vd], origin: [pointerX, pointerY] }) =>
+      onPinch(vd, pointerX - offsetX.value, pointerY - offsetY.value),
     onDrag: ({ delta: [x, y] }) => onDrag(x, y),
   },
   {

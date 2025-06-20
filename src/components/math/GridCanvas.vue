@@ -4,11 +4,20 @@ import { useGesture } from "@vueuse/gesture";
 
 import { clearGrid, createGrid } from "@/lib/math/grid";
 
-const MAJOR_DIVISON_INCREMENT = 20;
-const MINOR_DIVISIONS = 5;
-const MAJOR_DIVISION_SCALE = 2;
-const INITIAL_MAJOR_DIVISION_SIZE = 100;
-const INITIAL_MINOR_DIVISION_SIZE = INITIAL_MAJOR_DIVISION_SIZE / MINOR_DIVISIONS;
+const MAJOR_DIVISON_INCREMENT_MOUSE = 20;
+const MAJOR_DIVISON_INCREMENT_TOUCH = 20;
+
+const MINOR_DIVISIONS = [5, 4, 5];
+const MAJOR_DIVISION_SCALES = [2, 2, 5 / 2];
+const INCREMENT_COEFFS = [1, 2, 5];
+
+const INITIAL_MAJOR_DIVISION_SIZE = 160;
+const INITIAL_MINOR_DIVISION_SIZE = INITIAL_MAJOR_DIVISION_SIZE / MINOR_DIVISIONS[1];
+
+const MIN_DIVISION_SIZE = 100;
+const MAX_DIVISION_SIZE = 220;
+
+const ZOOM_LEVELS = 3;
 
 const container = useTemplateRef("main-container");
 const canvas = useTemplateRef("canvas-2d");
@@ -27,6 +36,11 @@ const incrementX = ref(2);
 const incrementY = ref(2);
 const originX = ref(width.value / 2);
 const originY = ref(width.value / 2);
+
+const zoomLevelX = ref(1);
+const zoomLevelY = ref(1);
+const incrementExpX = ref(0);
+const incrementExpY = ref(0);
 
 onMounted(() => {
   width.value = container.value!.clientWidth;
@@ -51,6 +65,8 @@ onMounted(() => {
     minorGridSizeY.value,
     incrementX.value,
     incrementY.value,
+    incrementExpX.value,
+    incrementExpY.value,
     originX.value,
     originY.value,
   );
@@ -74,16 +90,23 @@ const repaintGrid = () => {
     minorGridSizeY.value,
     incrementX.value,
     incrementY.value,
+    incrementExpX.value,
+    incrementExpY.value,
     originX.value,
     originY.value,
   );
 };
 
-const calculateNewOrigin = (pointerX: number, pointerY: number, zoomIn: boolean) => {
+const calculateNewOrigin = (
+  majorDivisionIncrement: number,
+  pointerX: number,
+  pointerY: number,
+  zoomIn: boolean,
+) => {
   const oldDistX = originX.value - pointerX;
   const oldDistY = originY.value - pointerY;
 
-  const deltaDivisionIncrement = zoomIn ? MAJOR_DIVISON_INCREMENT : -MAJOR_DIVISON_INCREMENT;
+  const deltaDivisionIncrement = zoomIn ? majorDivisionIncrement : -majorDivisionIncrement;
 
   const newDistX =
     ((majorGridSizeX.value + deltaDivisionIncrement) * oldDistX) / majorGridSizeX.value;
@@ -94,39 +117,71 @@ const calculateNewOrigin = (pointerX: number, pointerY: number, zoomIn: boolean)
   originY.value = newDistY + pointerY;
 };
 
-const zoomIn = () => {
-  majorGridSizeX.value = majorGridSizeX.value + MAJOR_DIVISON_INCREMENT;
-  minorGridSizeX.value = majorGridSizeX.value / MINOR_DIVISIONS;
-  majorGridSizeY.value = majorGridSizeY.value + MAJOR_DIVISON_INCREMENT;
-  minorGridSizeY.value = majorGridSizeY.value / MINOR_DIVISIONS;
-  if (majorGridSizeX.value >= INITIAL_MAJOR_DIVISION_SIZE * MAJOR_DIVISION_SCALE) {
-    majorGridSizeX.value = majorGridSizeX.value / MAJOR_DIVISION_SCALE;
-    minorGridSizeX.value = minorGridSizeX.value / MAJOR_DIVISION_SCALE;
-    incrementX.value = incrementX.value / MAJOR_DIVISION_SCALE;
+// Zoom order: 10 -> 5 -> 2 -> 1 -> 0.5 -> 0.2 -> 0.1
+const zoomIn = (majorDivisionIncrement: number) => {
+  majorGridSizeX.value = majorGridSizeX.value + majorDivisionIncrement;
+  minorGridSizeX.value = majorGridSizeX.value / MINOR_DIVISIONS[zoomLevelX.value];
+  majorGridSizeY.value = majorGridSizeY.value + majorDivisionIncrement;
+  minorGridSizeY.value = majorGridSizeY.value / MINOR_DIVISIONS[zoomLevelY.value];
+
+  const scaleX = MAJOR_DIVISION_SCALES[zoomLevelX.value];
+  if (majorGridSizeX.value >= MAX_DIVISION_SIZE) {
+    majorGridSizeX.value = majorGridSizeX.value / scaleX;
+    minorGridSizeX.value = minorGridSizeX.value / scaleX;
+    zoomLevelX.value = (zoomLevelX.value + ZOOM_LEVELS - 1) % ZOOM_LEVELS;
+
+    if (zoomLevelX.value === ZOOM_LEVELS - 1) {
+      incrementExpX.value = incrementExpX.value - 1;
+    }
+    incrementX.value = INCREMENT_COEFFS[zoomLevelX.value];
   }
-  if (majorGridSizeY.value >= INITIAL_MAJOR_DIVISION_SIZE * MAJOR_DIVISION_SCALE) {
-    majorGridSizeY.value = majorGridSizeY.value / MAJOR_DIVISION_SCALE;
-    minorGridSizeY.value = minorGridSizeY.value / MAJOR_DIVISION_SCALE;
-    incrementY.value = incrementY.value / MAJOR_DIVISION_SCALE;
+
+  const scaleY = MAJOR_DIVISION_SCALES[zoomLevelY.value];
+  if (majorGridSizeY.value >= MAX_DIVISION_SIZE) {
+    majorGridSizeY.value = majorGridSizeY.value / scaleY;
+    minorGridSizeY.value = minorGridSizeY.value / scaleY;
+    zoomLevelY.value = (zoomLevelY.value + ZOOM_LEVELS - 1) % ZOOM_LEVELS;
+
+    if (zoomLevelY.value === ZOOM_LEVELS - 1) {
+      incrementExpY.value = incrementExpY.value - 1;
+    }
+    incrementY.value = INCREMENT_COEFFS[zoomLevelY.value];
   }
+
   repaintGrid();
 };
 
-const zoomOut = () => {
-  majorGridSizeX.value = majorGridSizeX.value - MAJOR_DIVISON_INCREMENT;
-  minorGridSizeX.value = majorGridSizeX.value / MINOR_DIVISIONS;
-  majorGridSizeY.value = majorGridSizeY.value - MAJOR_DIVISON_INCREMENT;
-  minorGridSizeY.value = majorGridSizeY.value / MINOR_DIVISIONS;
-  if (majorGridSizeX.value <= INITIAL_MAJOR_DIVISION_SIZE / MAJOR_DIVISION_SCALE) {
-    majorGridSizeX.value = majorGridSizeX.value * MAJOR_DIVISION_SCALE;
-    minorGridSizeX.value = minorGridSizeX.value * MAJOR_DIVISION_SCALE;
-    incrementX.value = incrementX.value * MAJOR_DIVISION_SCALE;
+// Zoom order: 0.1 -> 0.2 -> 0.5 -> 1 -> 2 -> 5 -> 10
+const zoomOut = (majorDivisionIncrement: number) => {
+  majorGridSizeX.value = majorGridSizeX.value - majorDivisionIncrement;
+  minorGridSizeX.value = majorGridSizeX.value / MINOR_DIVISIONS[zoomLevelX.value];
+  majorGridSizeY.value = majorGridSizeY.value - majorDivisionIncrement;
+  minorGridSizeY.value = majorGridSizeY.value / MINOR_DIVISIONS[zoomLevelY.value];
+
+  const scaleX = MAJOR_DIVISION_SCALES[zoomLevelX.value];
+  if (majorGridSizeX.value <= MIN_DIVISION_SIZE) {
+    majorGridSizeX.value = majorGridSizeX.value * scaleX;
+    minorGridSizeX.value = minorGridSizeX.value * scaleX;
+    zoomLevelX.value = (zoomLevelX.value + 1) % ZOOM_LEVELS;
+
+    if (zoomLevelX.value === 0) {
+      incrementExpX.value = incrementExpX.value + 1;
+    }
+    incrementX.value = INCREMENT_COEFFS[zoomLevelX.value];
   }
-  if (majorGridSizeY.value <= INITIAL_MAJOR_DIVISION_SIZE / MAJOR_DIVISION_SCALE) {
-    majorGridSizeY.value = majorGridSizeY.value * MAJOR_DIVISION_SCALE;
-    minorGridSizeY.value = minorGridSizeY.value * MAJOR_DIVISION_SCALE;
-    incrementY.value = incrementY.value * MAJOR_DIVISION_SCALE;
+
+  const scaleY = MAJOR_DIVISION_SCALES[zoomLevelY.value];
+  if (majorGridSizeY.value <= MIN_DIVISION_SIZE) {
+    majorGridSizeY.value = majorGridSizeY.value * scaleY;
+    minorGridSizeY.value = minorGridSizeY.value * scaleY;
+    zoomLevelY.value = (zoomLevelY.value + 1) % ZOOM_LEVELS;
+
+    if (zoomLevelY.value === 0) {
+      incrementExpY.value = incrementExpY.value + 1;
+    }
+    incrementY.value = INCREMENT_COEFFS[zoomLevelY.value];
   }
+
   repaintGrid();
 };
 
@@ -145,26 +200,26 @@ const handleResize = () => {
 const onWheel = (y: number, pointerX: number, pointerY: number) => {
   // Scroll up (zoom in)
   if (y < 0) {
-    calculateNewOrigin(pointerX, pointerY, true);
-    zoomIn();
+    calculateNewOrigin(MAJOR_DIVISON_INCREMENT_MOUSE, pointerX, pointerY, true);
+    zoomIn(MAJOR_DIVISON_INCREMENT_MOUSE);
   }
   // Scroll down  (zoom out)
   else {
-    calculateNewOrigin(pointerX, pointerY, false);
-    zoomOut();
+    calculateNewOrigin(MAJOR_DIVISON_INCREMENT_MOUSE, pointerX, pointerY, false);
+    zoomOut(MAJOR_DIVISON_INCREMENT_MOUSE);
   }
 };
 
 const onPinch = (vd: number, pointerX: number, pointerY: number) => {
   // Pinch out (zoom in)
   if (vd > 0) {
-    calculateNewOrigin(pointerX, pointerY, true);
-    zoomIn();
+    calculateNewOrigin(MAJOR_DIVISON_INCREMENT_TOUCH, pointerX, pointerY, true);
+    zoomIn(MAJOR_DIVISON_INCREMENT_TOUCH);
   }
   // Pinch in (zoom out)
   else {
-    calculateNewOrigin(pointerX, pointerY, false);
-    zoomOut();
+    calculateNewOrigin(MAJOR_DIVISON_INCREMENT_TOUCH, pointerX, pointerY, false);
+    zoomOut(MAJOR_DIVISON_INCREMENT_TOUCH);
   }
 };
 

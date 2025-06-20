@@ -6,6 +6,24 @@ const BLACK = "#000";
 const GREY = "#979797";
 const DARK_GREY = "#535353";
 
+const multiplyByPowerOfTen = (coefficient: number, exponent: number) => {
+  if (exponent === 0) {
+    return coefficient;
+  } else if (exponent < 0) {
+    let result = coefficient;
+    for (let i = 0; i < -exponent; i++) {
+      result /= 10;
+    }
+    return result;
+  } else {
+    let result = coefficient;
+    for (let i = 0; i < exponent; i++) {
+      result *= 10;
+    }
+    return result;
+  }
+};
+
 const drawAxisLines = (
   ctx: CanvasRenderingContext2D,
   width: number,
@@ -70,6 +88,8 @@ const renderAxisValues = (
   gridIncrementY: number,
   incrementX: number,
   incrementY: number,
+  exponentX: number,
+  exponentY: number,
   originX: number,
   originY: number,
 ) => {
@@ -99,7 +119,7 @@ const renderAxisValues = (
     }
     renderAxisValue(
       ctx,
-      i * -incrementY,
+      multiplyByPowerOfTen(i * -incrementY, exponentY),
       verticalLabelPositionX,
       originY + i * gridIncrementY,
       verticalLabelFillStyle,
@@ -112,7 +132,7 @@ const renderAxisValues = (
     }
     renderAxisValue(
       ctx,
-      i * incrementY,
+      multiplyByPowerOfTen(i * incrementY, exponentY),
       verticalLabelPositionX,
       originY - i * gridIncrementY,
       verticalLabelFillStyle,
@@ -145,7 +165,7 @@ const renderAxisValues = (
     }
     renderAxisValue(
       ctx,
-      i * incrementX,
+      multiplyByPowerOfTen(i * incrementX, exponentX),
       originX + i * gridIncrementX,
       horizontalLabelPositionY,
       horizontalLabelFillStyle,
@@ -153,12 +173,12 @@ const renderAxisValues = (
   }
   // Negative values
   for (let i = 1; originX - i * gridIncrementX > 0; i++) {
-    if (originX + i * gridIncrementX > width) {
+    if (originX - i * gridIncrementX > width) {
       continue;
     }
     renderAxisValue(
       ctx,
-      i * -incrementX,
+      multiplyByPowerOfTen(i * -incrementX, exponentX),
       originX - i * gridIncrementX,
       horizontalLabelPositionY,
       horizontalLabelFillStyle,
@@ -180,6 +200,8 @@ const createGrid = (
   minorGridSizeY: number,
   incrementX: number,
   incrementY: number,
+  exponentX: number,
+  exponentY: number,
   originX: number,
   originY: number,
 ) => {
@@ -239,6 +261,8 @@ const createGrid = (
     majorGridSizeY,
     incrementX,
     incrementY,
+    exponentX,
+    exponentY,
     originX,
     originY,
   );

@@ -2,17 +2,15 @@
 import { onUnmounted, onMounted, ref, useTemplateRef } from "vue";
 import { useGesture } from "@vueuse/gesture";
 
-import EditableBlock from "./EditableBlock.vue";
+import TextBlock from "@/components/blocks/TextBlock.vue";
 
 const container = useTemplateRef("container");
 const dragArea = useTemplateRef("drag-area");
 
 const width = ref(500);
-// const height = ref(100);
 
 onMounted(() => {
   width.value = window.innerWidth * 0.32;
-  // height.value = container.value!.clientHeight;
   window.addEventListener("resize", handleResize);
 });
 
@@ -22,7 +20,6 @@ onUnmounted(() => {
 
 const handleResize = () => {
   width.value = container.value!.clientWidth;
-  // height.value = container.value!.clientHeight;
 };
 
 const onDrag = (x: number) => {
@@ -46,7 +43,7 @@ useGesture(
     :style="{ width: width + 'px' }"
   >
     <div>
-      <EditableBlock />
+      <TextBlock />
     </div>
     <div
       ref="drag-area"

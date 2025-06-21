@@ -54,7 +54,7 @@ const handleResize = () => {
   repaintGrid();
 };
 
-const handleResizeThrottled = useThrottleFn(handleResize, 50);
+const handleResizeThrottled = useThrottleFn(handleResize, 10);
 watch([width, height], handleResizeThrottled);
 
 onMounted(() => {

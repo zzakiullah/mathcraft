@@ -2,7 +2,7 @@
 import { onUnmounted, onMounted, ref, useTemplateRef } from "vue";
 import { useGesture } from "@vueuse/gesture";
 
-import TextBlock from "@/components/blocks/TextBlock.vue";
+import DefaultBlock from "@/components/blocks/DefaultBlock.vue";
 
 const container = useTemplateRef("container");
 const dragArea = useTemplateRef("drag-area");
@@ -43,7 +43,7 @@ useGesture(
     :style="{ width: width + 'px' }"
   >
     <div>
-      <TextBlock />
+      <DefaultBlock />
     </div>
     <div
       ref="drag-area"

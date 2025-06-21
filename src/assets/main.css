@@ -105,6 +105,11 @@ canvas {
   transform: translate(4px, -4px);
 }
 
+.block:empty:before {
+  content: attr(data-placeholder);
+  color: #acaba9; /* #acaba9, #c7c4c0 */
+}
+
 @media (hover: hover) {
   .custom-btn:hover > .right-to-down-arrow {
     transform: rotate(90deg);

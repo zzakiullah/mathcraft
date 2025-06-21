@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { onUnmounted, onMounted, ref, useTemplateRef } from "vue";
+import { onMounted, ref, useTemplateRef, watch } from "vue";
+import { useElementBounding } from "@vueuse/core";
 import { useGesture } from "@vueuse/gesture";
 
 import { clearGrid, createGrid } from "@/lib/math/grid";
@@ -19,14 +20,12 @@ const MAX_DIVISION_SIZE = 220;
 
 const ZOOM_LEVELS = 3;
 
-const container = useTemplateRef("main-container");
+const container = useTemplateRef("container");
 const canvas = useTemplateRef("canvas-2d");
 
+const { width, height, x: offsetX, y: offsetY } = useElementBounding(container);
+
 const context = ref<CanvasRenderingContext2D>();
-const width = ref(100);
-const height = ref(100);
-const offsetX = ref(0);
-const offsetY = ref(0);
 
 const majorGridSizeX = ref(INITIAL_MAJOR_DIVISION_SIZE);
 const majorGridSizeY = ref(INITIAL_MAJOR_DIVISION_SIZE);
@@ -42,15 +41,22 @@ const zoomLevelY = ref(1);
 const incrementExpX = ref(0);
 const incrementExpY = ref(0);
 
-onMounted(() => {
+const handleResize = () => {
   width.value = container.value!.clientWidth;
   height.value = container.value!.clientHeight;
+
+  originX.value = width.value / 2;
+  originY.value = height.value / 2;
+
   canvas.value!.width = width.value;
   canvas.value!.height = height.value;
+  repaintGrid();
+};
 
-  const rect = container.value!.getBoundingClientRect();
-  offsetX.value = rect.x;
-  offsetY.value = rect.y;
+watch(width, handleResize);
+watch(height, handleResize);
+
+onMounted(() => {
   originX.value = width.value / 2;
   originY.value = height.value / 2;
 
@@ -70,12 +76,6 @@ onMounted(() => {
     originX.value,
     originY.value,
   );
-
-  window.addEventListener("resize", handleResize);
-});
-
-onUnmounted(() => {
-  window.removeEventListener("resize", handleResize);
 });
 
 const repaintGrid = () => {
@@ -185,18 +185,6 @@ const zoomOut = (majorDivisionIncrement: number) => {
   repaintGrid();
 };
 
-const handleResize = () => {
-  width.value = container.value!.clientWidth;
-  height.value = container.value!.clientHeight;
-
-  originX.value = width.value / 2;
-  originY.value = height.value / 2;
-
-  canvas.value!.width = width.value;
-  canvas.value!.height = height.value;
-  repaintGrid();
-};
-
 const onWheel = (y: number, pointerX: number, pointerY: number) => {
   // Scroll up (zoom in)
   if (y < 0) {
@@ -243,7 +231,7 @@ useGesture(
 </script>
 
 <template>
-  <div ref="main-container" class="interactive-pane grow overflow-hidden">
-    <canvas ref="canvas-2d" @wheel.prevent></canvas>
+  <div ref="container" class="interactive-pane z-0 relative grow overflow-hidden">
+    <canvas ref="canvas-2d" @wheel.prevent :width="width" :height="height"></canvas>
   </div>
 </template>

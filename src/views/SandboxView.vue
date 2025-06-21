@@ -6,9 +6,11 @@ import GridCanvas from "@/components/math/GridCanvas.vue";
 
 <template>
   <SandboxLayout>
-    <main class="w-screen h-screen flex flex-row pt-14">
-      <NoteBoard />
-      <GridCanvas />
+    <main class="z-0 w-screen h-screen pt-14">
+      <div class="w-full h-full flex flex-row overflow-hidden">
+        <NoteBoard />
+        <GridCanvas />
+      </div>
     </main>
   </SandboxLayout>
 </template>

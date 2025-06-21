@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { onMounted, ref, useTemplateRef, watch } from "vue";
-import { useElementBounding } from "@vueuse/core";
+import { useElementBounding, useThrottleFn } from "@vueuse/core";
 import { useGesture } from "@vueuse/gesture";
 
 import { clearGrid, createGrid } from "@/lib/math/grid";
@@ -45,18 +45,25 @@ const handleResize = () => {
   width.value = container.value!.clientWidth;
   height.value = container.value!.clientHeight;
 
+  canvas.value!.width = width.value;
+  canvas.value!.height = height.value;
+
   originX.value = width.value / 2;
   originY.value = height.value / 2;
 
-  canvas.value!.width = width.value;
-  canvas.value!.height = height.value;
   repaintGrid();
 };
 
-watch(width, handleResize);
-watch(height, handleResize);
+const handleResizeThrottled = useThrottleFn(handleResize, 50);
+watch([width, height], handleResizeThrottled);
 
 onMounted(() => {
+  width.value = container.value!.clientWidth;
+  height.value = container.value!.clientHeight;
+
+  canvas.value!.width = width.value;
+  canvas.value!.height = height.value;
+
   originX.value = width.value / 2;
   originY.value = height.value / 2;
 
@@ -232,6 +239,6 @@ useGesture(
 
 <template>
   <div ref="container" class="interactive-pane z-0 relative grow overflow-hidden">
-    <canvas ref="canvas-2d" @wheel.prevent :width="width" :height="height"></canvas>
+    <canvas ref="canvas-2d" @wheel.prevent></canvas>
   </div>
 </template>
